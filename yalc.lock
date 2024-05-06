@@ -1,0 +1,10 @@
+{
+  "version": "v1",
+  "packages": {
+    "@smeijer/eslint-config": {
+      "signature": "cac16b8bb1cf49153b98f18cf9c6c231",
+      "file": true,
+      "replaced": "^1.0.2"
+    }
+  }
+}

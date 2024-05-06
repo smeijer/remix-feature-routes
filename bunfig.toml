@@ -1,0 +1,4 @@
+[install.lockfile]
+path = "bun.lockb"
+savePath = "bun.lockb"
+save = false
