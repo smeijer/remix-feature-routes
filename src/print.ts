@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
-import path from "node:path";
+import path from 'node:path';
 
-import { Route, RouteManifest } from "remix-custom-routes";
+import { Route, RouteManifest } from 'remix-custom-routes';
 
 export function printRouteManifest(routes: RouteManifest) {
 	// Helper function to generate the next parameter replacement letter
@@ -11,20 +11,18 @@ export function printRouteManifest(routes: RouteManifest) {
 		const remainder = count % 26;
 		count++;
 		return (
-			String.fromCharCode("a".charCodeAt(0) + remainder) +
-			(quotient > 0
-				? String.fromCharCode("a".charCodeAt(0) + quotient - 1)
-				: "")
+			String.fromCharCode('a'.charCodeAt(0) + remainder) +
+			(quotient > 0 ? String.fromCharCode('a'.charCodeAt(0) + quotient - 1) : '')
 		);
 	}
 
 	const replacements = new Map<string, string>();
 	const routeData = Object.values(routes).map((route) => {
-		let routePath = route.path || "";
+		let routePath = route.path || '';
 
 		let r: Route | undefined = route;
 		while (r?.parentId) {
-			routePath = path.join(routes[r.parentId]?.path || ".", routePath || ".");
+			routePath = path.join(routes[r.parentId]?.path || '.', routePath || '.');
 			r = routes[r.parentId];
 		}
 
@@ -38,36 +36,33 @@ export function printRouteManifest(routes: RouteManifest) {
 
 		return {
 			file: route.file,
-			path: routePath === "." ? "" : routePath,
+			path: routePath === '.' ? '' : routePath,
 			params,
-			exampleUrl: exampleUrl === "." ? "" : exampleUrl,
+			exampleUrl: exampleUrl === '.' ? '' : exampleUrl,
 		};
 	});
 
 	// Calculate maximum lengths for alignment
 	const longestFile = Math.max(...routeData.map((r) => r.file.length));
 	const longestPath = Math.max(...routeData.map((r) => r.path?.length || 0));
-	const longestURL = Math.max(
-		...routeData.map((r) => r.exampleUrl?.length || 0),
-	);
+	const longestURL = Math.max(...routeData.map((r) => r.exampleUrl?.length || 0));
 
 	// Construct output lines
 	const padding = 4;
 	const lines = routeData.map((route) => {
-		const filePadded = route.file.padEnd(longestFile + padding, " ");
-		const pathPadded = (
-			typeof route.path === "string" ? `/${route.path}` : ""
-		).padEnd(longestPath + padding, " ");
-		const urlPadded = (
-			typeof route.exampleUrl === "string" ? `/${route.exampleUrl}` : ""
-		).padEnd(longestURL + padding, " ");
+		const filePadded = route.file.padEnd(longestFile + padding, ' ');
+		const pathPadded = (typeof route.path === 'string' ? `/${route.path}` : '').padEnd(longestPath + padding, ' ');
+		const urlPadded = (typeof route.exampleUrl === 'string' ? `/${route.exampleUrl}` : '').padEnd(
+			longestURL + padding,
+			' ',
+		);
 
 		const paramsString =
 			Object.keys(route.params).length > 0
 				? `{ ${Object.entries(route.params)
 						.map(([k, v]) => `${k}: ${v}`)
-						.join(", ")} }`
-				: "";
+						.join(', ')} }`
+				: '';
 
 		return `${filePadded} ${pathPadded} ${urlPadded} ${paramsString}`;
 	});
@@ -76,11 +71,11 @@ export function printRouteManifest(routes: RouteManifest) {
 
 	// Print the formatted table
 	console.log(
-		`${"ROUTE".padEnd(longestFile + padding, " ")} ${"URL".padEnd(
+		`${'ROUTE'.padEnd(longestFile + padding, ' ')} ${'URL'.padEnd(
 			longestPath + padding,
-			" ",
-		)} ${"EXAMPLE".padEnd(longestURL + padding, " ")} PARAMS`,
+			' ',
+		)} ${'EXAMPLE'.padEnd(longestURL + padding, ' ')} PARAMS`,
 	);
-	console.log("-".repeat(longestLine));
-	console.log(lines.join("\n") + "\n");
+	console.log('-'.repeat(longestLine));
+	console.log(lines.join('\n') + '\n');
 }
