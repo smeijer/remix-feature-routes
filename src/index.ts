@@ -28,7 +28,7 @@ function getDomains(appDir: string) {
 		.map((x) => x.name);
 }
 
-type RouteConfig = {
+export type RouteConfig = {
 	basePath: string;
 };
 
