@@ -1,9 +1,12 @@
 {
 	"name": "remix-feature-routes",
-	"version": "0.0.1",
+	"version": "0.0.3",
 	"description": "remix router inspired by domain driven design",
 	"license": "MIT",
-	"repository": "smeijer/remix-feature-routes",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/smeijer/remix-feature-routes.git"
+	},
 	"funding": "https://github.com/smeijer/remix-feature-routes?sponsor=1",
 	"author": "Stephan Meijer <stephan.meijer@gmail.com> (meijer.ws)",
 	"bugs": "https://github.com/smeijer/remix-feature-routes/issues",
