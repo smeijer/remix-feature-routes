@@ -1,17 +1,24 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { cosmiconfig as Cosmiconfig } from 'cosmiconfig';
 import { findUp } from 'find-up';
 import { type GlobOptions, globSync } from 'glob';
-import { dirname } from 'path';
 import { ensureRootRouteExists, getRouteIds, getRouteManifest } from 'remix-custom-routes';
-import { fileURLToPath } from 'url';
 
+import { loadJs, loadTs } from './config.js';
 import { printRouteManifest } from './print.js';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
 const ignoreDomains = new Set(['shared']);
+
+const cosmiconfig = Cosmiconfig('remix-feature-routes', {
+	loaders: {
+		'.mjs': loadJs,
+		'.cjs': loadJs,
+		'.js': loadJs,
+		'.ts': loadTs,
+	},
+});
 
 function getDomains(appDir: string) {
 	return fs
@@ -32,22 +39,28 @@ export type RouteConfig = {
 	basePath: string;
 };
 
-async function getRouteConfig(appDirectory: string, domain: string): Promise<RouteConfig> {
-	// this runs somewhere in node_modules/remix-feature-routes, we need import relative from it
-	const domainDir = path.relative(__dirname, path.join(`${appDirectory}/${domain}`));
-	if (!fs.existsSync(`${domainDir}/config.ts`)) return { basePath: domain };
-
-	// due to vite globbing, we can only use vars in the mid
-	const config = await import(`./${domainDir}/config.ts`).then((x: unknown) =>
-		typeof x === 'object' && x && 'routeConfig' in x && typeof x.routeConfig === 'object' && x.routeConfig
-			? (x.routeConfig as Partial<RouteConfig>)
-			: ({} as Partial<RouteConfig>),
-	);
-
-	return {
-		// _domain results in a 'pathless route', so it groups them without affecting pathname
-		basePath: !config.basePath ? domain : config.basePath === '/' ? `_${domain}` : normalizeId(config.basePath),
+async function getRouteConfig(domain: string): Promise<RouteConfig> {
+	// TODO: need some more testing, but ideally we dont' use cosmiconfig for this
+	//   thing is, dynamic import from vite use globs and error often, require doesnt work
+	//   and this takes time to get right.
+	//   Also, cosmiconfig.load works, but calling loadTS directly does not, while the args
+	//   are the same.
+	const config: RouteConfig = {
+		basePath: domain,
 	};
+
+	if (fs.existsSync(`./app/${domain}/config.ts`)) {
+		const loaded = await cosmiconfig.load(`./app/${domain}/config.ts`);
+		Object.assign(config, loaded?.config);
+	}
+
+	if (config.basePath === '/') {
+		config.basePath = `_${domain}`;
+	} else {
+		config.basePath = normalizeId(config.basePath);
+	}
+
+	return config;
 }
 
 function normalizeId(id: string) {
@@ -57,8 +70,8 @@ function normalizeId(id: string) {
 /**
  * Mutates the routeId array to our domain convention
  */
-async function parseRouteIds(appDirectory: string, domain: string, routeIds: Array<[string, string]>) {
-	const routeConfig = await getRouteConfig(appDirectory, domain);
+async function parseRouteIds(domain: string, routeIds: Array<[string, string]>) {
+	const routeConfig = await getRouteConfig(domain);
 
 	for (const route of routeIds) {
 		route[1] = path.join(domain, route[1]);
@@ -111,9 +124,12 @@ export function featureRoutes(options?: Options) {
 				indexNames: ['index'],
 			}) as unknown as [string, string][];
 
-			await parseRouteIds(appDirectory, domain, domainRoutes);
+			await parseRouteIds(domain, domainRoutes);
 			routeIds.push(...domainRoutes);
 		}
+
+		// re-sort, as ids might have changed
+		routeIds.sort(([a], [b]) => b.length - a.length);
 
 		const manifest = getRouteManifest(routeIds);
 
