@@ -64,17 +64,24 @@ async function parseRouteIds(appDirectory: string, domain: string, routeIds: Arr
 		route[1] = path.join(domain, route[1]);
 		const basename = path.basename(route[0]);
 
-		if (basename === '_layout') {
-			route[0] = `${routeConfig.basePath}`;
-		} else if (basename === 'index') {
-			route[0] = `${routeConfig.basePath}._${route[0]}`;
-		} else {
-			route[0] = `${routeConfig.basePath}.${route[0]}`;
+		const id = `${routeConfig.basePath}.${basename}`;
+		const segments = id.split('.');
+		for (let idx = 0; idx < segments.length; idx++) {
+			const segment = segments[idx]!;
+			if (segment === '_layout') {
+				segments[idx] = '';
+			} else if (segment === 'index') {
+				segments[idx] = `_${segment}`;
+			} else if (segment === '_') {
+				segments[idx - 1] = `${segments[idx - 1]}_`;
+				segments[idx] = '';
+			} else {
+				segments[idx] = segment;
+			}
 		}
-	}
 
-	// re-sort, as ids might have changed
-	routeIds.sort(([a], [b]) => b.length - a.length);
+		route[0] = segments.filter(Boolean).join('.');
+	}
 }
 
 type Options = {
