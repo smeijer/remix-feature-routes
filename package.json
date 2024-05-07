@@ -19,7 +19,7 @@
 	},
 	"scripts": {
 		"dev": "pkgroll --watch",
-		"build": "pkgroll --minify",
+		"build": "pkgroll",
 		"prepare": "npx simple-git-hooks",
 		"lint": "eslint --fix .",
 		"type-check": "tsc --noEmit",
