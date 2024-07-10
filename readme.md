@@ -11,24 +11,18 @@ npm install remix-feature-routes
 ## Usage
 
 ```js
-import { vitePlugin as remix } from "@remix-run/dev";
-import { featureRoutes } from "remix-feature-routes";
-import { defineConfig } from "vite";
+import { vitePlugin as remix } from '@remix-run/dev';
+import { featureRoutes } from 'remix-feature-routes';
+import { defineConfig } from 'vite';
 
 export default defineConfig({
 	plugins: [
 		remix({
 			// require to disable remix default routing algoritm
-			ignoredRouteFiles: ["**/*"],
+			ignoredRouteFiles: ['**/*'],
 			routes: featureRoutes({
 				// optional
-				ignoredRouteFiles: [
-					".*",
-					"**/*.css",
-					"**/*.test.{js,jsx,ts,tsx}",
-					"**/__*.*",
-					"**/internal/**",
-				],
+				ignoredRouteFiles: ['.*', '**/*.css', '**/*.test.{js,jsx,ts,tsx}', '**/__*.*', '**/internal/**'],
 			}),
 		}),
 		tsconfigPaths(),
@@ -49,10 +43,10 @@ auth/config.ts #  export const routeConfig = { basePath: '/' }
 auth/components/login-form.ts
 auth/components/signup-form.ts
 auth/models/user.ts
-auth/routes/index.tsx          /auth
-auth/routes/login.tsx          /auth/login
-auth/routes/signup.tsx         /auth/signup
-auth/routes/_layout.tsx        /auth
+auth/routes/index.tsx          /
+auth/routes/login.tsx          /login
+auth/routes/signup.tsx         /signup
+auth/routes/_layout.tsx        /
 
 # Products related code and routes
 products/routes/index.tsx      /products
@@ -74,7 +68,7 @@ By default, domains have their domain name prefixed. Using a basePath of `/` mov
 
 ```ts
 export const routeConfig = {
-	basePath: "/",
+	basePath: '/',
 };
 ```
 
@@ -82,7 +76,7 @@ We also support params in the basePath:
 
 ```ts
 export const routeConfig = {
-	basePath: "/$owner/$repo",
+	basePath: '/$owner/$repo',
 };
 
 // repos/routes/index.tsx      /:owner/:repo
