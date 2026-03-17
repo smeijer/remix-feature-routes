@@ -18,7 +18,7 @@ import { defineConfig } from 'vite';
 export default defineConfig({
 	plugins: [
 		remix({
-			// require to disable remix default routing algoritm
+			// require to disable remix default routing algorithm
 			ignoredRouteFiles: ['**/*'],
 			routes: featureRoutes({
 				// optional

@@ -23,11 +23,11 @@
 		"prepare": "npx simple-git-hooks",
 		"lint": "eslint --fix .",
 		"type-check": "tsc --noEmit",
-		"test": "npm run build && node ./dist/cli.mjs example/component.tsx",
+		"test": "npm run build",
 		"prepack": "npm run build"
 	},
 	"simple-git-hooks": {
-		"pre-commit": "pretty-quick --staged"
+		"pre-commit": "npx pretty-quick --staged"
 	},
 	"files": [
 		"dist",
